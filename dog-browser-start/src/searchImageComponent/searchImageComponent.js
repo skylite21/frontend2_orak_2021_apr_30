@@ -14,11 +14,18 @@ class SearchImage {
     content.innerHTML = '';
   }
 
+  clearErrors() {
+    const errors = document.querySelector('.errors');
+    errors.innerHTML = '';
+  }
+
   // megjelenít egy hibaüzenetet a felhasználónak
   displayError(message) {
+    this.clearErrors();
     const popupMessage = document.createElement('h2');
     popupMessage.classList.add('error-message');
     popupMessage.innerHTML = message;
+    // <h2 class="error-message"> message </h2>
     document.querySelector('.errors').appendChild(popupMessage);
   }
 
@@ -26,7 +33,7 @@ class SearchImage {
   async getImages(dogbreed) {
 
     if(!dogbreed) {
-      window.alert('Nem lett beírva semmi a keresőbe, nem tudunk keresni!');
+      this.displayError('Nem lett beírva semmi a keresőbe, nem tudunk keresni!');
       // megállítjuk a getImages függvény futását
       return;
     }
@@ -47,6 +54,8 @@ class SearchImage {
  
   // ez a metódus megjelenít egy képet (véletlenszerűen)
   displayImage(data) {
+    this.clearErrors();
+    this.clearContent();
     const image = document.createElement('img');
     // a data.message tömbből egy véletlenszerű elemet kiválasztunk
     image.src = data.message[Math.floor(Math.random() * data.message.length)];
