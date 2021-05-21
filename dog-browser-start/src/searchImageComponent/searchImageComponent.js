@@ -2,6 +2,27 @@ import '../css/searchImageComponent.css';
 
 
 class SearchImage {
+
+  constructor() {
+    // példányosításkor, megjelenítjük a keresőt automatikusan
+    this.render();
+  }
+
+  // ha van már kép megjelenítve akkor azt töröljük
+  clearContent() {
+    const content = document.querySelector('#content');
+    content.innerHTML = '';
+  }
+
+  // megjelenít egy hibaüzenetet a felhasználónak
+  displayError(message) {
+    const popupMessage = document.createElement('h2');
+    popupMessage.classList.add('error-message');
+    popupMessage.innerHTML = message;
+    document.querySelector('.errors').appendChild(popupMessage);
+  }
+
+  // Ez a metódus letölti az adatot az API-ról
   async getImages(dogbreed) {
 
     if(!dogbreed) {
@@ -20,12 +41,19 @@ class SearchImage {
     }
     const response = await fetch(urlString);
     const data = await response.json();
+    // a data változó egy objecteket tartalmazó tömb
+    return data;
+  }
+ 
+  // ez a metódus megjelenít egy képet (véletlenszerűen)
+  displayImage(data) {
     const image = document.createElement('img');
     // a data.message tömbből egy véletlenszerű elemet kiválasztunk
     image.src = data.message[Math.floor(Math.random() * data.message.length)];
     document.querySelector('#content').appendChild(image);
-    console.log(data);
+    // console.log(data);
   }
+
 
   // megjeleníti a keresőt:
   render() {
@@ -43,10 +71,19 @@ class SearchImage {
       event.preventDefault(); 
       // console.log(event);
       const searchTerm = document.querySelector('#dogSearchInput').value;
-      this.getImages(searchTerm);
+      // mivel a getImages egy async method, ezért ez is promise-al tér vissza
+      // emiatt, a promise object-en amit a getImages visszaad, elérhető a .then() metódus
+      // a then metódus bementi paramétere egy callback funciton, ami akkor fut le amikor
+      // a promise beteljesül (akkor jön létre a data amit visszaad a getImages metódus)
+      // ha az arrow funciton-ben csak egy bemeneti paraméter van, akkor a zárójel elhagyható
+      this.getImages(searchTerm).then( result => {
+        // ha csak egy dolgot kell csinálni az if block-ban, akkor a kódblokk {} elhagyható
+        if (result) this.displayImage(result);
+      });
     });
 
   }
 }
 
 export default SearchImage;
+
